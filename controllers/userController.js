@@ -1,21 +1,56 @@
-const userModel = require("../models/userModel");
-const { createCustomError } = require("../errors/custom-error");
+const express = require('express');
+const userUpdate = require('../controllers/userController');
+const userAuth = require('../middleware/authMiddleware');
 
-const userUpdate = async (req,res,next)=>{
-    const {Fname,Lname,email,location} = req.body;
-    if(!Fname || !Lname || !email || !location)
-    {
-        return next(createCustomError("Please provide all the details",400));
-    }
-    const user = await userModel.findOne({_id:req.user.userID});
-    user.Fname = Fname;
-    user.Lname = Lname;
-    user.email = email;
-    user.location = location;
+const router = express.Router();
 
-    await user.save();
-    const token = user.createJWT();
-    res.status(200).json({user,token});
-}
+//! These are all for the API documentation, kindly ignore them...The actual logic lies down below
+/**
+ * @swagger
+ * /api/v1/user/user-update:
+ *   put:
+ *     summary: Update user information
+ *     description: Updates user information with provided details, **May give output as "Invalid token"! Bearer token field updating soon...**
+ *     tags: [User]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               Fname:
+ *                 type: string
+ *                 description: The first name of the user.
+ *               Lname:
+ *                 type: string
+ *                 description: The last name of the user.
+ *               email:
+ *                 type: string
+ *                 description: The email address of the user.
+ *               location:
+ *                 type: string
+ *                 description: The location of the user.
+ *     responses:
+ *       '200':
+ *         description: User information updated successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               user:
+ *                 _id: "60c30e3873d37a001c8e2489"
+ *                 Fname: John
+ *                 Lname: Doe
+ *                 email: john@example.com
+ *                 location: New York
+ *               token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+ *       '400':
+ *         description: Invalid request or missing required fields
+ */
 
-module.exports = userUpdate;
+
+router.route('/user-update').put(userAuth, userUpdate);
+
+module.exports = router;
