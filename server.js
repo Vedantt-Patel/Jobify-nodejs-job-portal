@@ -52,7 +52,7 @@ const start = async() => {
                     },
                     servers:[
                         {
-                            url:"http://localhost:3000"
+                            url:"https://jobify-a-nodejs-job-portal.onrender.com/"
                         }
                     ]
                     },
