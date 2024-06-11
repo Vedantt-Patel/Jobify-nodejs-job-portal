@@ -40,31 +40,41 @@ app.use('/api/v1/job', jobsRoutes);
 app.use(errorHandlerMiddleware);
 const port = process.env.PORT || 3000;
 
-const start = async() => {
+const start = async () => {
     try {
         await connectDB(process.env.MONGO_URI);
-        const options={
-            definition:{
+        const options = {
+            definition: {
                 openapi: "3.0.0",
-                info:{
+                info: {
                     title: "Jobify API",
                     description: "Jobify API Documentation in Node and Express",
-                    },
-                    servers:[
-                        {
-                            url:"https://jobify-a-nodejs-job-portal.onrender.com/"
-                        }
-                    ]
-                    },
-                apis:['./routes/*.js'],
+                },
+                servers: [
+                    {
+                        url: "http://localhost:3000"
+                    }
+                ],
+                securityDefinitions: {
+                    bearerAuth: {
+                        type: 'apiKey',
+                        name: 'Authorization',
+                        in: 'header',
+                        description: "Enter your bearer token in the format 'Bearer <token>'"
+                    }
                 }
-            const spec = swaggerDoc(options);
-            app.use('/api-doc', swaggerUI.serve, swaggerUI.setup(spec))
-            app.listen(port, ()=>{
+            },
+            apis: ['./routes/*.js'],
+        }
+        const spec = swaggerDoc(options);
+        app.use('/api-doc', swaggerUI.serve, swaggerUI.setup(spec))
+        app.listen(port, () => {
+            console.log(`Server is running on port ${port}`);
         });
     } catch (error) {
+        console.error("Error starting the server:", error);
     }
-
 }
+
 
 start();
